@@ -146,17 +146,79 @@ st.info("이 기간 동안 일관객 합계가 가장 큰 5편의 영화가 날�
 st.divider()
 
 # --------------------------------------------------
+# --------------------------------------------------
+# 그래프 3. 날짜별 10위권 일관객 합계
+# --------------------------------------------------
+st.header("3. 날짜별 10위권 일관객 합계")
+st.caption("각 날짜의 박스오피스 10위권 영화가 기록한 일관객을 모두 합산해 보여 줍니다.")
+
+daily_total = (
+    df.dropna(subset=["날짜", "일관객"])
+    .groupby("날짜", as_index=False)["일관객"]
+    .sum()
+    .sort_values("날짜")
+)
+
+top3_days = daily_total.nlargest(3, "일관객").sort_values("날짜")
+
+fig3 = px.area(
+    daily_total,
+    x="날짜",
+    y="일관객",
+    title="날짜별 박스오피스 10위권 일관객 합계",
+    labels={
+        "날짜": "날짜",
+        "일관객": "10위권 일관객 합계"
+    },
+    hover_data={
+        "날짜": "|%Y-%m-%d",
+        "일관객": ":,",
+    }
+)
+
+fig3.update_traces(
+    hovertemplate="날짜: %{x|%Y-%m-%d}<br>10위권 일관객 합계: %{y:,}명<extra></extra>"
+)
+
+for _, row in top3_days.iterrows():
+    fig3.add_annotation(
+        x=row["날짜"],
+        y=row["일관객"],
+        text=f"{row['날짜'].strftime('%Y-%m-%d')}<br>{row['일관객']:,}명",
+        showarrow=True,
+        arrowhead=2,
+        ax=0,
+        ay=-45,
+        bgcolor="rgba(255,255,255,0.85)",
+        bordercolor="rgba(0,0,0,0.25)",
+        borderwidth=1
+    )
+
+fig3.update_layout(
+    hovermode="x unified",
+    xaxis_title="날짜",
+    yaxis_title="10위권 일관객 합계(명)"
+)
+
+st.plotly_chart(fig3, use_container_width=True)
+
+st.markdown("**이 그래프로 알 수 있는 것:**")
+st.info("날짜에 따라 박스오피스 10위권 전체의 관객 규모가 어떻게 변했는지와 관객이 특히 많이 몰린 날을 확인할 수 있습니다.")
+
+st.divider()
+
+# --------------------------------------------------
 # 앞으로 추가할 그래프 구역
 # --------------------------------------------------
-st.header("3. 추가 그래프")
-st.caption("앞으로 시간에 따른 다른 영화 데이터 그래프를 이 구역에 추가할 수 있습니다.")
+st.header("4. 추가 그래프")
+st.caption("새로운 시간 관련 그래프를 계속 추가할 수 있는 공간입니다.")
 
 st.markdown("**이 그래프로 알 수 있는 것:**")
 st.info("여기에 추가 그래프를 통해 알 수 있는 내용을 작성하세요.")
 
 st.divider()
 
-st.header("4. 추가 그래프")
+st.header("5. 추가 그래프")
 st.caption("새로운 그래프를 계속 추가할 수 있는 공간입니다.")
 
 st.markdown("**이 그래프로 알 수 있는 것:**")
