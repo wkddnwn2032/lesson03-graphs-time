@@ -197,10 +197,14 @@ st.header("4. 영화별 기간 일관객 TOP 10")
 movie_summary = (
     df.dropna(subset=["영화명", "일관객", "날짜"])
     .groupby("영화명")
-    .agg(
-        기간_일관객=("일관객", "sum"),
-        10위권_등장일수=("날짜", "nunique")
-    )
+    .agg({
+        "일관객": "sum",
+        "날짜": "nunique"
+    })
+    .rename(columns={
+        "일관객": "기간_일관객",
+        "날짜": "10위권_등장일수"
+    })
     .nlargest(10, "기간_일관객")
     .sort_values("기간_일관객", ascending=True)
     .reset_index()
